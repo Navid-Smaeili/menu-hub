@@ -1,0 +1,80 @@
+{
+  "name": "public-menu",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/public-menu/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/public-menu",
+        "browser": "apps/public-menu/src/main.ts",
+        "tsConfig": "apps/public-menu/tsconfig.app.json",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/public-menu/public"
+          }
+        ],
+        "styles": ["apps/public-menu/src/styles.css"],
+        "server": "apps/public-menu/src/main.server.ts",
+        "ssr": {
+          "entry": "apps/public-menu/src/server.ts"
+        },
+        "outputMode": "server"
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "4kb",
+              "maximumError": "8kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      }
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@angular/build:dev-server",
+      "defaultConfiguration": "development",
+      "configurations": {
+        "production": {
+          "buildTarget": "public-menu:build:production"
+        },
+        "development": {
+          "buildTarget": "public-menu:build:development"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "serve-static": {
+      "continuous": true,
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "public-menu:build",
+        "port": 4200,
+        "staticFilePath": "dist/apps/public-menu/browser",
+        "spa": true
+      }
+    }
+  }
+}

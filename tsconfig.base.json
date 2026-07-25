@@ -21,8 +21,13 @@
       "@org/shop/feature-product-detail": [
         "packages/shop/feature-product-detail/src/index.ts"
       ],
-      "@org/shop/feature-products": ["packages/shop/feature-products/src/index.ts"],
-      "@org/shop/shared-ui": ["packages/shop/shared-ui/src/index.ts"]
+      "@org/shop/feature-products": [
+        "packages/shop/feature-products/src/index.ts"
+      ],
+      "@org/shop/shared-ui": ["packages/shop/shared-ui/src/index.ts"],
+      "@org/ui": ["./libs/ui/src/index.ts"],
+      "@org/shared": ["./libs/shared/src/index.ts"],
+      "@org/auth": ["./libs/auth/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
