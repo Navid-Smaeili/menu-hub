@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../../../packages/shared/models/src/index.ts"],
+  "sourcesContent": ["export * from './lib/product.model';\r\n"],
+  "mappings": ";;;;;;;;;;;;;;AAAA;AAAA;AAAA,wBAAc,gCAAd;",
+  "names": []
+}

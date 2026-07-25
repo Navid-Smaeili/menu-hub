@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../../../packages/api/products/src/index.ts"],
+  "sourcesContent": ["export * from './lib/products.service';\r\n"],
+  "mappings": ";;;;;;;;;;;;;;AAAA;AAAA;AAAA,wBAAc,mCAAd;",
+  "names": []
+}
