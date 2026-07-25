@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../../../../packages/shared/models/src/lib/product.model.ts"],
+  "sourcesContent": ["export interface Product {\r\n  id: string;\r\n  name: string;\r\n  description: string;\r\n  price: number;\r\n  category: string;\r\n  imageUrl: string;\r\n  inStock: boolean;\r\n  rating: number;\r\n  reviewCount: number;\r\n}\r\n\r\nexport interface ApiResponse<T> {\r\n  data: T;\r\n  success: boolean;\r\n  message?: string;\r\n  error?: string;\r\n}\r\n\r\nexport interface PaginatedResponse<T> {\r\n  items: T[];\r\n  total: number;\r\n  page: number;\r\n  pageSize: number;\r\n  totalPages: number;\r\n}\r\n\r\nexport interface ProductFilter {\r\n  category?: string;\r\n  minPrice?: number;\r\n  maxPrice?: number;\r\n  inStock?: boolean;\r\n  searchTerm?: string;\r\n}"],
+  "mappings": ";;;;;;;;;;;;;AAAA;AAAA;",
+  "names": []
+}
