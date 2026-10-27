@@ -22,13 +22,13 @@ __export(products_service_exports, {
 module.exports = __toCommonJS(products_service_exports);
 class ProductsService {
   constructor() {
+    this.categories = ["Electronics", "Clothing", "Books", "Home & Garden", "Sports"];
     this.products = this.generateMockProducts();
   }
   generateMockProducts() {
-    const categories = ["Electronics", "Clothing", "Books", "Home & Garden", "Sports"];
     const products = [];
     for (let i = 1; i <= 50; i++) {
-      const category = categories[Math.floor(Math.random() * categories.length)];
+      const category = this.categories[Math.floor(Math.random() * this.categories.length)];
       products.push({
         id: `prod-${i}`,
         name: `Product ${i}`,
@@ -90,7 +90,23 @@ class ProductsService {
     return this.products.find((p) => p.id === id) || null;
   }
   getCategories() {
-    return [...new Set(this.products.map((p) => p.category))];
+    return [.../* @__PURE__ */ new Set([...this.categories, ...this.products.map((p) => p.category)])];
+  }
+  addCategory(name) {
+    const category = name.trim();
+    if (category && !this.categories.includes(category)) this.categories.push(category);
+    return this.getCategories();
+  }
+  addProduct(product) {
+    const created = {
+      ...product,
+      id: `prod-${Date.now()}`,
+      rating: 0,
+      reviewCount: 0
+    };
+    this.products.unshift(created);
+    this.addCategory(created.category);
+    return created;
   }
   getPriceRange() {
     const prices = this.products.map((p) => p.price);

@@ -1,8 +1,12 @@
 {
-  "name": "@org/source",
+  "name": "@menu/hub",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "s-all": "npx nx run-many -t=serve --all",
+    "b-all": "npx nx run-many -t=build --all",
+    "ss-all": "npx nx run-many -t=serve-static --all"
+  },
   "private": true,
   "dependencies": {
     "@angular-devkit/build-angular": "21.2.7",

@@ -1,0 +1,22 @@
+/* themes/dark.css */
+[data-theme="dark"] {
+  --ui-background: 11 14 20;
+  --ui-foreground: 248 250 252;
+  
+  --ui-surface: 15 23 42;
+  --ui-surface-hover: 30 41 59;
+  --ui-surface-active: 51 65 85;
+  
+  --ui-elevated: 30 41 59;
+  
+  --ui-border: 51 65 85;
+  --ui-border-hover: 71 85 105;
+  
+  --ui-text: 248 250 252;
+  --ui-text-muted: 148 163 184;
+  --ui-text-disabled: 71 85 105;
+  
+  --ui-overlay: 248 250 252;
+  
+  /* Colors remain same but can be adjusted for dark */
+}

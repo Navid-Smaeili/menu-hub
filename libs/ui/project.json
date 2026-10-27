@@ -1,5 +1,17 @@
 {
-  "name": "ui",
+  "name": "@ui",
+  "version": "1.0.0",
+  "exports": {
+    "./core": "./core/index.ts",
+    "./styles": "./styles/index.css",
+    "./button": "./button/index.ts",
+    "./input": "./input/index.ts",
+    "./select": "./select/index.ts",
+    "./checkbox": "./checkbox/index.ts",
+    "./toast": "./toast/index.ts",
+    "./dialog": "./dialog/index.ts",
+    "./table": "./table/index.ts"
+  },
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/ui/src",
   "prefix": "lib",

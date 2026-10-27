@@ -1,14 +1,14 @@
 import { Product, ProductFilter, PaginatedResponse } from '@org/models';
 
 export class ProductsService {
+  private categories = ['Electronics', 'Clothing', 'Books', 'Home & Garden', 'Sports'];
   private products: Product[] = this.generateMockProducts();
 
   private generateMockProducts(): Product[] {
-    const categories = ['Electronics', 'Clothing', 'Books', 'Home & Garden', 'Sports'];
     const products: Product[] = [];
 
     for (let i = 1; i <= 50; i++) {
-      const category = categories[Math.floor(Math.random() * categories.length)];
+      const category = this.categories[Math.floor(Math.random() * this.categories.length)];
       products.push({
         id: `prod-${i}`,
         name: `Product ${i}`,
@@ -88,7 +88,25 @@ export class ProductsService {
   }
 
   getCategories(): string[] {
-    return [...new Set(this.products.map(p => p.category))];
+    return [...new Set([...this.categories, ...this.products.map(p => p.category)])];
+  }
+
+  addCategory(name: string): string[] {
+    const category = name.trim();
+    if (category && !this.categories.includes(category)) this.categories.push(category);
+    return this.getCategories();
+  }
+
+  addProduct(product: Omit<Product, 'id' | 'rating' | 'reviewCount'>): Product {
+    const created: Product = {
+      ...product,
+      id: `prod-${Date.now()}`,
+      rating: 0,
+      reviewCount: 0,
+    };
+    this.products.unshift(created);
+    this.addCategory(created.category);
+    return created;
   }
 
   getPriceRange(): { min: number; max: number } {

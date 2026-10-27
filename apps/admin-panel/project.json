@@ -47,8 +47,13 @@
     },
     "serve": {
       "continuous": true,
+      "dependsOn": ["api:serve"],
       "executor": "@angular/build:dev-server",
       "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "admin-panel:build",
+        "port": 4001
+      },
       "configurations": {
         "production": {
           "buildTarget": "admin-panel:build:production"

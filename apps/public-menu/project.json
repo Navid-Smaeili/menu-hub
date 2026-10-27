@@ -54,6 +54,10 @@
       "continuous": true,
       "executor": "@angular/build:dev-server",
       "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "public-menu:build",
+        "port": 4003
+      },
       "configurations": {
         "production": {
           "buildTarget": "public-menu:build:production"

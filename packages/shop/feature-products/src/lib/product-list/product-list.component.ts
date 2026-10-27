@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProductsService } from '@org/shop/data';
 import { Product, ProductFilter } from '@org/models';
+import { LanguageService } from '@org/shared';
 import {
   ProductGridComponent,
   LoadingSpinnerComponent,
@@ -21,55 +22,58 @@ import {
   ],
   template: `
     <div class="product-list-container">
-      <header class="page-header">
-        <h1>Our Products</h1>
-        <p>Explore our wide selection of high-quality products</p>
+      <header class="catalog-heading">
+        <div>
+          <span class="eyebrow">{{ t('catalogEyebrow') }}</span>
+          <h1>{{ t('productsTitle') }}</h1>
+          <p>{{ t('productsDescription') }}</p>
+        </div>
+        <div class="catalog-stamp"><span aria-hidden="true">✦</span><small>{{ t('freshDaily') }}</small></div>
       </header>
 
-      <div class="filters-section">
+      <section class="catalog-toolbar" aria-label="{{ t('catalogFilters') }}">
         <div class="search-box">
+          <span aria-hidden="true">⌕</span>
           <input
             type="text"
-            placeholder="Search products..."
+            [placeholder]="t('searchProducts')"
+            [attr.aria-label]="t('searchProducts')"
             [(ngModel)]="searchTerm"
             (ngModelChange)="onSearchChange()"
             class="search-input"
           />
+          @if (searchTerm) {
+            <button type="button" class="clear-search" [attr.aria-label]="t('clearSearch')" (click)="searchTerm = ''; onSearchChange()">×</button>
+          }
         </div>
 
-        <div class="filter-controls">
-          <select
-            [(ngModel)]="selectedCategory"
-            (ngModelChange)="onFilterChange()"
-            class="filter-select"
-          >
-            <option value="">All Categories</option>
-            @for (category of categories(); track category) {
-              <option [value]="category">{{ category }}</option>
-            }
-          </select>
+        <label class="stock-filter" [class.checked]="inStockOnly">
+          <input type="checkbox" [(ngModel)]="inStockOnly" (ngModelChange)="onFilterChange()" />
+          <span class="checkmark" aria-hidden="true">✓</span>
+          {{ t('inStockOnly') }}
+        </label>
+      </section>
 
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              [(ngModel)]="inStockOnly"
-              (ngModelChange)="onFilterChange()"
-            />
-            In Stock Only
-          </label>
-        </div>
-      </div>
+      <nav class="category-filters" [attr.aria-label]="t('catalogCategories')">
+        <button type="button" [class.selected]="selectedCategory === ''" (click)="selectCategory('')">{{ t('allCategories') }}</button>
+        @for (category of categories(); track category) {
+          <button type="button" [class.selected]="selectedCategory === category" (click)="selectCategory(category)">{{ category }}</button>
+        }
+      </nav>
 
       @if (loading()) {
         <shop-loading-spinner />
       } @else if (error()) {
         <shop-error-message
-          [message]="error() || undefined"
+          [message]="t('loadError')"
           (retry)="loadProducts()"
         />
       } @else {
-        <div class="results-info">
-          Showing {{ products().length }} of {{ totalProducts() }} products
+        <div class="results-bar">
+          <div class="results-info"><span class="result-number">{{ formatNumber(totalProducts()) }}</span> {{ t('products') }}<span class="result-divider">·</span>{{ t('showing') }} {{ formatNumber(products().length) }}</div>
+          @if (selectedCategory || inStockOnly || searchTerm) {
+            <button class="clear-filters" type="button" (click)="clearFilters()">{{ t('clearFilters') }} <span aria-hidden="true">×</span></button>
+          }
         </div>
 
         <shop-product-grid
@@ -80,21 +84,23 @@ import {
         @if (hasMorePages()) {
           <div class="pagination">
             <button
-              class="btn-secondary"
-              [disabled]="currentPage() === 1"
-              (click)="previousPage()"
+                class="page-button"
+                [disabled]="currentPage() === 1"
+                [attr.aria-label]="t('previous')"
+                (click)="previousPage()"
             >
-              Previous
+                <span aria-hidden="true">{{ locale.language() === 'fa' ? '→' : '←' }}</span>
             </button>
             <span class="page-info">
-              Page {{ currentPage() }} of {{ totalPages() }}
+                {{ t('page') }} {{ formatNumber(currentPage()) }} {{ t('of') }} {{ formatNumber(totalPages()) }}
             </span>
             <button
-              class="btn-secondary"
-              [disabled]="currentPage() === totalPages()"
-              (click)="nextPage()"
+                class="page-button"
+                [disabled]="currentPage() === totalPages()"
+                [attr.aria-label]="t('next')"
+                (click)="nextPage()"
             >
-              Next
+                <span aria-hidden="true">{{ locale.language() === 'fa' ? '←' : '→' }}</span>
             </button>
           </div>
         }
@@ -103,135 +109,165 @@ import {
   `,
   styles: [`
     .product-list-container {
-      max-width: 1200px;
+      width: min(1180px, calc(100% - 48px));
       margin: 0 auto;
-      padding: 24px;
+      padding: 44px 0 76px;
     }
 
-    .page-header {
-      text-align: center;
-      margin-bottom: 48px;
+    .catalog-heading {
+      display: flex;
+      min-height: 145px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
     }
 
-    .page-header h1 {
-      font-size: 2.5rem;
-      margin-bottom: 8px;
-      color: #333;
+    .eyebrow { color: var(--rust); font-size: 11px; font-weight: 700; }
+    .catalog-heading h1 { margin: 4px 0 2px; color: var(--ink); font-size: 30px; line-height: 1.5; }
+    .catalog-heading p { margin: 0; color: var(--muted); font-size: 12px; }
+    .catalog-stamp {
+      display: flex;
+      width: 120px;
+      height: 74px;
+      flex: 0 0 auto;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--paper) 60%, transparent);
+      color: var(--leaf);
+    }
+    .catalog-stamp > span { font-size: 21px; line-height: 1; }
+    .catalog-stamp small { color: var(--muted); font-size: 9px;
     }
 
-    .page-header p {
-      font-size: 1.1rem;
-      color: #666;
-    }
-
-    .filters-section {
-      background: #f8f9fa;
-      padding: 24px;
-      border-radius: 8px;
-      margin-bottom: 32px;
+    .catalog-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--paper) 92%, transparent);
     }
 
     .search-box {
-      margin-bottom: 16px;
+      display: flex;
+      width: min(450px, 70%);
+      height: 42px;
+      align-items: center;
+      gap: 9px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--rust);
     }
 
     .search-input {
       width: 100%;
-      padding: 12px 16px;
-      font-size: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      transition: border-color 0.3s;
+      height: 100%;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: 12px;
     }
 
-    .search-input:focus {
-      outline: none;
-      border-color: #3498db;
+    .search-input::placeholder { color: var(--muted); }
+    .clear-search {
+      display: grid;
+      width: 26px;
+      height: 26px;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 18px;
     }
 
-    .filter-controls {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .filter-select {
-      padding: 8px 16px;
-      font-size: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      background: white;
-      cursor: pointer;
-    }
-
-    .checkbox-label {
+    .stock-filter {
       display: flex;
       align-items: center;
       gap: 8px;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-
-    .checkbox-label input {
-      width: 18px;
-      height: 18px;
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 11px;
       cursor: pointer;
     }
-
-    .results-info {
-      color: #666;
-      margin-bottom: 16px;
-      font-size: 0.95rem;
+    .stock-filter input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .checkmark {
+      display: grid;
+      width: 17px;
+      height: 17px;
+      place-items: center;
+      border: 1px solid var(--line);
+      color: transparent;
+      font-size: 10px;
     }
-
-    .pagination {
+    .stock-filter.checked { color: var(--ink); }
+    .stock-filter.checked .checkmark { border-color: var(--leaf); background: var(--leaf); color: #fff; }
+    .category-filters {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-      margin-top: 48px;
-      padding-top: 24px;
-      border-top: 1px solid #e0e0e0;
+      gap: 8px;
+      margin: 16px 0 20px;
+      overflow-x: auto;
+      padding-bottom: 3px;
+      scrollbar-width: thin;
     }
-
-    .page-info {
-      color: #666;
-      font-size: 1rem;
+    .category-filters button {
+      min-height: 34px;
+      flex: 0 0 auto;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 10px;
+      transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
     }
-
-    .btn-secondary {
-      padding: 8px 16px;
-      background: #6c757d;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background 0.3s;
+    .category-filters button:hover { border-color: var(--leaf); color: var(--ink); }
+    .category-filters button.selected { border-color: var(--leaf); background: var(--leaf); color: #fff; }
+    .results-bar { display: flex; min-height: 32px; align-items: center; justify-content: space-between; gap: 12px; }
+    .results-info { color: var(--muted); font-size: 10px; }
+    .result-number { color: var(--ink); font-weight: 700; }
+    .result-divider { margin: 0 7px; color: var(--line); }
+    .clear-filters { border: 0; background: transparent; color: var(--rust); font: inherit; font-size: 10px; }
+    .clear-filters span { margin-right: 5px; font-size: 15px; vertical-align: middle; }
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .page-info { color: var(--muted); font-size: 11px; }
+    .page-button {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--ink);
+      font: inherit;
+      font-size: 16px;
     }
-
-    .btn-secondary:hover:not(:disabled) {
-      background: #5a6268;
-    }
-
-    .btn-secondary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    .page-button:disabled { opacity: .4; cursor: not-allowed;
     }
 
     @media (max-width: 768px) {
       .product-list-container {
-        padding: 16px;
+        width: min(100% - 32px, 1180px);
+        padding: 30px 0 55px;
       }
-
-      .page-header h1 {
-        font-size: 2rem;
+      .catalog-heading { min-height: 120px; }
+      .catalog-heading h1 { font-size: 25px; }
+      .catalog-stamp { width: 82px; height: 62px;
       }
-
-      .filter-controls {
-        flex-direction: column;
-        align-items: stretch;
+      .catalog-toolbar { align-items: stretch; flex-direction: column; }
+      .search-box { width: 100%; }
+      .stock-filter { align-self: flex-start;
       }
     }
   `],
@@ -240,6 +276,31 @@ import {
 export class ProductListComponent implements OnInit {
   private readonly productsService = inject(ProductsService);
   private readonly router = inject(Router);
+  protected readonly locale = inject(LanguageService);
+
+  protected t(key: string): string {
+    const messages: Record<string, [string, string]> = {
+      productsTitle: ['منوی کافه', 'Cafe menu'],
+      productsDescription: ['انتخابی تازه از طعم‌های محبوب ما', 'Explore our selection of cafe favorites'],
+      catalogEyebrow: ['از دل آشپزخانه', 'From our kitchen'],
+      freshDaily: ['تازه، هر روز', 'Fresh every day'],
+      catalogFilters: ['جست‌وجو و فیلترهای منو', 'Menu search and filters'],
+      catalogCategories: ['دسته‌بندی محصولات', 'Product categories'],
+      searchProducts: ['جست‌وجو در منو...', 'Search the menu...'],
+      clearSearch: ['پاک کردن جست‌وجو', 'Clear search'],
+      allCategories: ['همه دسته‌بندی‌ها', 'All categories'],
+      inStockOnly: ['فقط موارد موجود', 'In stock only'],
+      clearFilters: ['پاک کردن فیلترها', 'Clear filters'],
+      loadError: ['بارگذاری منو انجام نشد. دوباره تلاش کن.', 'Could not load the menu. Please try again.'],
+      showing: ['نمایش', 'Showing'],
+      of: ['از', 'of'],
+      products: ['محصول', 'items'],
+      previous: ['قبلی', 'Previous'],
+      page: ['صفحه', 'Page'],
+      next: ['بعدی', 'Next'],
+    };
+    return messages[key]?.[this.locale.language() === 'fa' ? 0 : 1] ?? key;
+  }
 
   // State signals
   readonly products = signal<Product[]>([]);
@@ -309,6 +370,22 @@ export class ProductListComponent implements OnInit {
   onFilterChange() {
     this.currentPage.set(1);
     this.loadProducts();
+  }
+
+  selectCategory(category: string) {
+    this.selectedCategory = category;
+    this.onFilterChange();
+  }
+
+  clearFilters() {
+    this.searchTerm = '';
+    this.selectedCategory = '';
+    this.inStockOnly = false;
+    this.onFilterChange();
+  }
+
+  formatNumber(value: number): string {
+    return new Intl.NumberFormat(this.locale.language() === 'fa' ? 'fa-IR' : 'en-US').format(value);
   }
 
   onProductSelect(product: Product) {

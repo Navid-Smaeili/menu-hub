@@ -55,6 +55,7 @@
       "dependsOn": ["api:serve"],
       "continuous": true,
       "executor": "@angular/build:dev-server",
+      
       "configurations": {
         "production": {
           "buildTarget": "shop:build:production"
@@ -65,7 +66,8 @@
       },
       "defaultConfiguration": "development",
       "options": {
-        "proxyConfig": "apps/shop/proxy.conf.json"
+        "proxyConfig": "apps/shop/proxy.conf.json",        
+        "port": 4004
       }
     },
     "extract-i18n": {

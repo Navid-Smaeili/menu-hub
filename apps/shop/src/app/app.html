@@ -1,9 +1,23 @@
+<div class="app-shell" [attr.dir]="locale.direction" [attr.lang]="locale.language()">
 <header class="app-header">
-  <div class="container">
-    <h1>{{ title }}</h1>
-    <nav>
-      <a routerLink="/products" routerLinkActive="active">Products</a>
+  <div class="header-inner">
+    <a class="brand" routerLink="/dashboard" [attr.aria-label]="t('brand')">
+      <span class="brand-mark">{{ locale.language() === 'fa' ? 'ن' : 'N' }}</span>
+      <span class="brand-name">{{ t('brand') }}<small>{{ t('tagline') }}</small></span>
+    </a>
+    <nav [attr.aria-label]="t('mainNavigation')">
+      <a routerLink="/dashboard" routerLinkActive="active">{{ t('home') }}</a>
+      <a routerLink="/categories" routerLinkActive="active">{{ t('categories') }}</a>
+      <a routerLink="/products" routerLinkActive="active">{{ t('menu') }}</a>
     </nav>
+    <div class="header-actions">
+      <button class="language-toggle" type="button" (click)="locale.toggle()" [attr.aria-label]="locale.language() === 'fa' ? 'Switch language to English' : 'تغییر زبان به فارسی'">{{ locale.language() === 'fa' ? 'EN' : 'فا' }}</button>
+      <button class="theme-toggle" type="button" (click)="theme.toggle()" [attr.aria-label]="t(theme.mode() === 'light' ? 'switchToDark' : 'switchToLight')" [attr.title]="t(theme.mode() === 'light' ? 'switchToDark' : 'switchToLight')">
+        <span aria-hidden="true">{{ theme.mode() === 'light' ? '☾' : '☀' }}</span>
+      </button>
+      <a class="cart-link" routerLink="/cart" [attr.aria-label]="t('cart')"><span aria-hidden="true">♧</span><b>{{ cart.itemCount }}</b></a>
+      <a class="account-link" routerLink="/auth">{{ t('account') }} <span aria-hidden="true">↗</span></a>
+    </div>
   </div>
 </header>
 
@@ -12,8 +26,10 @@
 </main>
 
 <footer class="app-footer">
-  <div class="container">
-    <p>© 2025 Nx Shop Demo - Showcasing Nx Monorepo Features</p>
-    <p>Frontend (Angular) + Backend (Express) + Shared Libraries</p>
+  <div class="footer-inner">
+    <span>{{ t('brand') }}</span>
+    <p>{{ t('footer') }}</p>
+    <span class="footer-hours">{{ t('hours') }}</span>
   </div>
 </footer>
+</div>

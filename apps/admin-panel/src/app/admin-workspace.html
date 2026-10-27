@@ -1,0 +1,98 @@
+<div class="workspace">
+  <div class="page-title-row">
+    <div><span class="eyebrow">{{ page === 'orders' ? 'سفارش‌های آنلاین' : page === 'tables' ? 'مدیریت سالن' : 'مدیریت منو' }}</span><h1>{{ title }}</h1><p>{{ page === 'product' ? 'اطلاعات محصول تازه را وارد کن تا به منوی کافه اضافه شود.' : page === 'category' ? 'منوی کافه را با دسته‌بندی‌های مرتب و قابل پیدا کردن نگه دار.' : page === 'tables' ? 'آزاد، رزرو و مشغول بودن میزها را از یک نمای واحد کنترل کن.' : 'سفارش‌های جدید را ببین و وضعیت آماده‌سازی را به‌روز کن.' }}</p></div>
+    @if (page === 'orders') { <span class="live-pill"><i></i> دریافت سفارش فعال</span> }
+  </div>
+
+  @if (page === 'product') {
+    <div class="content-layout">
+      <section class="form-panel">
+        <div class="panel-heading"><div><h2>مشخصات محصول</h2><p>فیلدهای ستاره‌دار الزامی هستند.</p></div><span class="step-number">01</span></div>
+        <form (ngSubmit)="saveProduct()">
+          <label>نام محصول <em>*</em><input [(ngModel)]="productName" name="productName" placeholder="مثلاً لاته عسل و دارچین" required /></label>
+          <div class="form-row">
+            <label>دسته‌بندی <em>*</em><select [(ngModel)]="productCategory" name="productCategory" required>@for (category of categories; track category) { <option [value]="category">{{ category }}</option> }</select></label>
+            <label>قیمت (تومان) <em>*</em><input [(ngModel)]="productPrice" name="productPrice" type="number" min="1" placeholder="۱۴۸۰۰۰" required /></label>
+          </div>
+          <label>توضیحات محصول<textarea [(ngModel)]="productDescription" name="productDescription" rows="4" placeholder="مواد اصلی یا ویژگی خاص این محصول..."></textarea></label>
+          <label class="availability-toggle"><input type="checkbox" [(ngModel)]="available" name="available" /><span class="toggle-track"></span><span><strong>نمایش در منو</strong><small>محصول برای سفارش مشتریان قابل مشاهده باشد</small></span></label>
+          @if (savedMessage) { <p class="success-message" role="status">{{ savedMessage }}</p> }
+          <div class="form-actions"><button class="primary-button" type="submit">ذخیره محصول <span>←</span></button><button class="quiet-button" type="reset" (click)="productName = ''; productPrice = null; productDescription = ''">پاک کردن فرم</button></div>
+        </form>
+      </section>
+      <aside class="side-panel">
+        <div class="panel-heading"><div><h2>محصولات اخیر</h2><p>{{ products.length }} محصول ثبت‌شده</p></div><span class="list-icon">▤</span></div>
+        @if (products.length) {
+          <ul class="recent-list">@for (product of products.slice(0, 5); track product.name) { <li><span class="product-dot">✦</span><span><strong>{{ product.name }}</strong><small>{{ product.category }}</small></span><b>{{ formatPrice(product.price) }} <small>تومان</small></b></li> }</ul>
+        } @else { <div class="empty-note"><span>＋</span><p>هنوز محصولی اضافه نشده.<br />اولین محصول را ثبت کن.</p></div> }
+        <div class="side-tip"><span>نکته</span><p>نام کوتاه و توضیح روشن کمک می‌کند مشتری سریع‌تر انتخاب کند.</p></div>
+      </aside>
+    </div>
+  } @else if (page === 'category') {
+    <div class="content-layout">
+      <section class="form-panel">
+        <div class="panel-heading"><div><h2>ساخت دسته‌بندی</h2><p>برای مرتب‌سازی منو یک گروه تازه بساز.</p></div><span class="step-number">01</span></div>
+        <form (ngSubmit)="saveCategory()">
+          <label>نام دسته‌بندی <em>*</em><input [(ngModel)]="categoryName" name="categoryName" placeholder="مثلاً نوشیدنی سرد" required /></label>
+          <label>توضیح کوتاه<textarea [(ngModel)]="categoryDescription" name="categoryDescription" rows="4" placeholder="یک توضیح کوتاه برای این دسته..."></textarea></label>
+          @if (savedMessage) { <p class="success-message" role="status">{{ savedMessage }}</p> }
+          <div class="form-actions"><button class="primary-button" type="submit">ساخت دسته‌بندی <span>←</span></button></div>
+        </form>
+      </section>
+      <aside class="side-panel">
+        <div class="panel-heading"><div><h2>دسته‌بندی‌های منو</h2><p>{{ categories.length }} دسته‌بندی فعال</p></div><span class="list-icon">▦</span></div>
+        <ul class="category-list">@for (category of categories; track category) { <li><span class="category-symbol">▦</span><strong>{{ category }}</strong><span class="category-active">فعال</span></li> }</ul>
+        <div class="side-tip"><span>چیدمان منو</span><p>محصول‌ها را در دسته‌ی مناسب بگذار تا پیدا کردنشان راحت باشد.</p></div>
+      </aside>
+    </div>
+  } @else if (page === 'tables') {
+    <div class="table-summary">
+      <article><span class="table-summary-icon free-icon">○</span><div><strong>{{ availableTables }}</strong><small>میز آزاد</small></div></article>
+      <article><span class="table-summary-icon busy-icon">●</span><div><strong>{{ occupiedTables }}</strong><small>میز مشغول</small></div></article>
+      <article><span class="table-summary-icon reserved-icon">◷</span><div><strong>{{ reservedTables }}</strong><small>میز رزروشده</small></div></article>
+    </div>
+    <section class="table-management-panel">
+      <div class="panel-heading"><div><h2>وضعیت سالن</h2><p>برای تغییر وضعیت هر میز از کنترل همان کارت استفاده کن.</p></div><span class="table-count">{{ tables.length }} میز</span></div>
+      @if (tableError) { <p class="table-error" role="alert">{{ tableError }}</p> }
+      <div class="table-grid">
+        @for (table of tables; track table.id) {
+          <article class="table-card" [class.table-available]="table.status === 'available'" [class.table-occupied]="table.status === 'occupied'" [class.table-reserved]="table.status === 'reserved'">
+            <div class="table-card-top"><span class="table-shape" aria-hidden="true">▦</span><span class="table-state">{{ tableStatusLabel(table.status) }}</span></div>
+            <h3>{{ table.name }}</h3>
+            <p>{{ table.seats }} نفره</p>
+            <div class="table-card-actions">
+              @if (table.status !== 'reserved') {
+                <button type="button" class="table-main-action" (click)="cycleTableStatus(table)">{{ tableStatusAction(table.status) }}</button>
+                <button type="button" class="table-reserve-action" (click)="toggleReservation(table)">رزرو</button>
+              } @else {
+                <button type="button" class="table-main-action" (click)="toggleReservation(table)">لغو رزرو</button>
+                <button type="button" class="table-reserve-action" (click)="cycleTableStatus(table)">ثبت حضور</button>
+              }
+            </div>
+          </article>
+        }
+      </div>
+      <form class="add-table-form" (ngSubmit)="addTable()">
+        <div><h3>افزودن میز</h3><p>میز تازه به سالن اضافه کن.</p></div>
+        <label>نام میز<input [(ngModel)]="tableName" name="tableName" placeholder="مثلاً میز تراس ۱" required /></label>
+        <label>ظرفیت<select [(ngModel)]="tableSeats" name="tableSeats">@for (seats of [2, 4, 6, 8, 10]; track seats) { <option [ngValue]="seats">{{ seats }} نفره</option> }</select></label>
+        <button class="primary-button" type="submit">افزودن میز <span>←</span></button>
+      </form>
+    </section>
+  } @else {
+    <div class="order-metrics">
+      <article><span class="metric-icon rust">↗</span><div><strong>{{ newOrdersCount }}</strong><small>سفارش جدید</small></div></article>
+      <article><span class="metric-icon green">◷</span><div><strong>{{ orders.length }}</strong><small>کل سفارش‌های امروز</small></div></article>
+      <article><span class="metric-icon gold">ت</span><div><strong>{{ formatPrice(totalRevenue) }}</strong><small>فروش امروز · تومان</small></div></article>
+    </div>
+    <section class="orders-panel">
+      <div class="panel-heading"><div><h2>صف سفارش‌ها</h2><p>سفارش‌ها بر اساس زمان ثبت مرتب شده‌اند.</p></div><button class="filter-button" type="button">همه وضعیت‌ها⌄</button></div>
+      <div class="orders-table-wrap"><table><thead><tr><th>شماره سفارش</th><th>مشتری</th><th>اقلام</th><th>مبلغ</th><th>زمان ثبت</th><th>وضعیت</th><th></th></tr></thead><tbody>
+        @for (order of orders; track order.id) {
+          <tr><td class="order-id">{{ order.id }}</td><td>{{ order.customer }}</td><td>{{ order.items }}</td><td class="amount">{{ formatPrice(order.total) }} تومان</td><td class="muted-cell">{{ order.time }}</td><td><span class="status-pill" [class.status-new]="order.status === 'new'" [class.status-preparing]="order.status === 'preparing'" [class.status-ready]="order.status === 'ready'">{{ statusLabel(order.status) }}</span></td><td><button class="order-action" type="button" [disabled]="order.status === 'ready'" (click)="advanceOrder(order)">{{ nextAction(order.status) }}</button></td></tr>
+        }
+      </tbody></table></div>
+      @if (!orders.length) { <div class="empty-note"><span>✓</span><p>فعلاً سفارشی در صف نیست.</p></div> }
+    </section>
+  }
+</div>

@@ -1,2 +1,23 @@
-<app-nx-welcome></app-nx-welcome>
-<router-outlet></router-outlet>
+<div class="admin-shell" dir="rtl" lang="fa">
+	<aside class="sidebar">
+		<a class="admin-brand" routerLink="/products/new">
+			<span class="brand-mark">ن</span>
+			<span>نون و نمک<small>مدیریت کافه</small></span>
+		</a>
+		<span class="nav-caption">مدیریت منو</span>
+		<nav aria-label="ناوبری مدیریت">
+			<a routerLink="/products/new" routerLinkActive="active"><span>＋</span> افزودن محصول</a>
+			<a routerLink="/categories/new" routerLinkActive="active"><span>▦</span> دسته‌بندی‌ها</a>
+			<a routerLink="/orders" routerLinkActive="active"><span>▤</span> سفارش‌های دریافتی <b>۳</b></a>
+			<a routerLink="/tables" routerLinkActive="active"><span>▥</span> مدیریت میزها</a>
+		</nav>
+		<div class="sidebar-bottom"><span class="avatar">م</span><span>مدیر کافه<small>دسترسی کامل</small></span><button aria-label="گزینه‌های حساب" type="button">···</button></div>
+	</aside>
+	<main class="admin-main">
+		<header class="topbar">
+			<span class="breadcrumb">پنل مدیریت <span>/</span> کافه نون و نمک</span>
+			<div class="topbar-tools"><span class="live-indicator"><i></i> کافه باز است</span><button class="icon-control" type="button" aria-label="اعلان‌ها">♧<span class="notification-dot"></span></button></div>
+		</header>
+		<router-outlet></router-outlet>
+	</main>
+</div>

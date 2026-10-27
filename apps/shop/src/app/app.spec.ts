@@ -25,25 +25,25 @@ describe('App', () => {
 
   it('should render title in header', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Nx Shop Demo');
+    expect(compiled.querySelector('.brand-name')?.textContent).toContain(
+      'کافه نون و نمک'
+    );
   });
 
   it('should render navigation links', () => {
     const navLinks = fixture.debugElement.queryAll(By.css('nav a'));
-    expect(navLinks.length).toBeGreaterThan(0);
-    expect(navLinks[0].nativeElement.textContent).toContain('Products');
-    expect(navLinks[0].nativeElement.getAttribute('routerLink')).toBe(
-      '/products'
-    );
+    expect(navLinks.length).toBe(3);
+    expect(navLinks[0].nativeElement.textContent).toContain('خانه');
+    expect(navLinks[0].nativeElement.getAttribute('routerLink')).toBe('/dashboard');
+    expect(navLinks[1].nativeElement.textContent).toContain('دسته‌بندی‌ها');
+    expect(navLinks[1].nativeElement.getAttribute('routerLink')).toBe('/categories');
   });
 
   it('should render footer with correct copyright', () => {
     const footer = fixture.nativeElement.querySelector('.app-footer');
     expect(footer).toBeTruthy();
-    expect(footer?.textContent).toContain('© 2025 Nx Shop Demo');
-    expect(footer?.textContent).toContain(
-      'Frontend (Angular) + Backend (Express) + Shared Libraries'
-    );
+    expect(footer?.textContent).toContain('کافه نون و نمک');
+    expect(footer?.textContent).toContain('هر روز، تازه و با عشق آماده می‌شود');
   });
 
   it('should have router outlet for dynamic content', () => {

@@ -1,0 +1,211 @@
+@if (page === 'auth') {
+  <section class="auth-page">
+    <div class="auth-photo">
+      <div class="auth-photo-copy">
+        <span class="eyebrow">{{ t('authPhotoEyebrow') }}</span>
+        <h2>{{ t('authHeroLine1') }}<br />{{ t('authHeroLine2') }}</h2>
+        <p>{{ t('authHeroDesc') }}</p>
+      </div>
+      <span class="photo-credit">{{ t('photoCredit') }}</span>
+    </div>
+    <div class="auth-panel">
+      <div class="auth-heading">
+        <span class="eyebrow">{{ t('welcomeBack') }}</span>
+        <h1>{{ authMode === 'signin' ? t('signinTitle') : t('signupTitle') }}</h1>
+        <p>{{ authMode === 'signin' ? t('signinDesc') : t('signupDesc') }}</p>
+      </div>
+      <div class="auth-tabs" role="tablist" [attr.aria-label]="t('authTabs')">
+        <button type="button" [class.selected]="authMode === 'signin'" (click)="setAuthMode('signin')">{{ t('signin') }}</button>
+        <button type="button" [class.selected]="authMode === 'signup'" (click)="setAuthMode('signup')">{{ t('signup') }}</button>
+      </div>
+      <form class="auth-form" (ngSubmit)="submitAuth()">
+        @if (authMode === 'signup') {
+          <label>{{ t('fullName') }}
+            <input name="fullName" [(ngModel)]="fullName" autocomplete="name" [placeholder]="t('namePlaceholder')" required />
+          </label>
+        }
+        <label>{{ t('email') }}
+          <input name="email" [(ngModel)]="email" autocomplete="username" [placeholder]="t('emailPlaceholder')" required />
+        </label>
+        <label>{{ t('password') }}
+          <input name="password" [(ngModel)]="password" type="password" autocomplete="current-password" [placeholder]="t('passwordPlaceholder')" minlength="8" required />
+        </label>
+        @if (authMode === 'signin') {
+          <a class="forgot-link" routerLink="/auth">{{ t('forgot') }}</a>
+        }
+        <button class="button button-primary auth-submit" type="submit">{{ authMode === 'signin' ? t('submitSignin') : t('submitSignup') }} <span aria-hidden="true">←</span></button>
+      </form>
+      <p class="auth-note">{{ t('termsLead') }} <a routerLink="/auth">{{ t('terms') }}</a> {{ t('privacy') }}</p>
+      <div class="auth-divider"><span>{{ t('or') }}</span></div>
+      <button class="button button-outline guest-button" type="button" routerLink="/dashboard">{{ t('guest') }}</button>
+    </div>
+  </section>
+} @else if (page === 'dashboard') {
+  <div class="portal-container dashboard-page">
+    <section class="welcome-row">
+      <div>
+        <span class="eyebrow">{{ t('dayAhead') }}</span>
+        <h1>{{ t('hello') }} {{ displayNameLabel }}, <span>{{ t('welcome') }}</span></h1>
+        <p>{{ t('dashboardQuestion') }}</p>
+      </div>
+      <a class="button button-primary" routerLink="/categories">{{ t('newOrder') }} <span aria-hidden="true">←</span></a>
+    </section>
+
+    <section class="dashboard-hero">
+      <div class="hero-copy">
+        <span class="hero-kicker">{{ t('chefPick') }}</span>
+        <h2>{{ t('calmBreakfast') }}<br />{{ t('calmStart') }}</h2>
+        <p>{{ t('breakfastDescription') }}</p>
+        <a class="hero-link" routerLink="/categories">{{ t('seePicks') }} <span aria-hidden="true">←</span></a>
+      </div>
+      <div class="hero-stamp"><span>{{ t('fresh') }}</span><strong>{{ t('everyDay') }}</strong><span>{{ t('withLove') }}</span></div>
+    </section>
+
+    <section class="stats-grid" [attr.aria-label]="t('accountSummary')">
+      <article class="stat-item"><span class="stat-icon">↻</span><div><strong>{{ locale.language() === 'fa' ? '۱۲' : '12' }}</strong><span>{{ t('orderCount') }}</span></div></article>
+      <article class="stat-item"><span class="stat-icon">✦</span><div><strong>{{ locale.language() === 'fa' ? '۸۴۰' : '840' }}</strong><span>{{ t('loyalty') }}</span></div></article>
+      <article class="stat-item"><span class="stat-icon">⌖</span><div><strong>{{ t('tehran') }}</strong><span>{{ t('savedAddress') }}</span></div></article>
+      <article class="stat-item"><span class="stat-icon">◷</span><div><strong>{{ t('minutes') }}</strong><span>{{ t('deliveryTime') }}</span></div></article>
+    </section>
+
+    <section class="content-section orders-section">
+      <div class="section-heading">
+        <div><span class="eyebrow">{{ t('pastOrders') }}</span><h2>{{ t('recentOrders') }}</h2></div>
+        <a routerLink="/products" class="text-link">{{ t('allOrders') }} <span aria-hidden="true">←</span></a>
+      </div>
+      <div class="order-list">
+        <article class="order-row">
+          <div class="order-thumb order-thumb-coffee">☕</div>
+          <div class="order-main"><strong>{{ t('firstOrder') }}</strong><span>{{ t('orderDateOne') }}</span></div>
+          <span class="order-status delivered">{{ t('delivered') }}</span>
+          <strong class="order-price">{{ formatPrice(328000) }} <small>{{ t('currency') }}</small></strong>
+          <button class="icon-button" type="button" [attr.aria-label]="t('reorder')" (click)="addToCart(menuItems[0])">↻</button>
+        </article>
+        <article class="order-row">
+          <div class="order-thumb order-thumb-food">♨</div>
+          <div class="order-main"><strong>{{ t('secondOrder') }}</strong><span>{{ t('orderDateTwo') }}</span></div>
+          <span class="order-status delivered">{{ t('delivered') }}</span>
+          <strong class="order-price">{{ formatPrice(440000) }} <small>{{ t('currency') }}</small></strong>
+          <button class="icon-button" type="button" [attr.aria-label]="t('reorder')" (click)="addToCart(menuItems[2])">↻</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="content-section menu-section">
+      <div class="section-heading">
+        <div><span class="eyebrow">{{ t('bestsellerEyebrow') }}</span><h2>{{ t('bestsellers') }}</h2></div>
+        <a routerLink="/categories" class="text-link">{{ t('viewMenu') }} <span aria-hidden="true">←</span></a>
+      </div>
+      <div class="menu-grid">
+        @for (item of menuItems.slice(0, 3); track item.nameEn) {
+          <article class="menu-card">
+            <div class="menu-image"><img [src]="item.image" [alt]="itemName(item)" (error)="imageUnavailable($event)" /><span class="item-badge">{{ itemBadge(item) }}</span><button class="add-button" type="button" [attr.aria-label]="t('addToCart') + ' ' + itemName(item)" (click)="addToCart(item)">+</button></div>
+            <div class="menu-card-copy"><span class="item-category">{{ categoryLabel(item.category) }}</span><h3>{{ itemName(item) }}</h3><p>{{ itemDescription(item) }}</p><strong>{{ formatPrice(item.price) }} <small>{{ t('currency') }}</small></strong></div>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="content-section menu-section">
+      <div class="section-heading">
+        <div><span class="eyebrow">{{ t('newestEyebrow') }}</span><h2>{{ t('newestMenu') }}</h2></div>
+        <a routerLink="/categories" class="text-link">{{ t('allNew') }} <span aria-hidden="true">←</span></a>
+      </div>
+      <div class="menu-grid">
+        @for (item of menuItems.slice(3, 6); track item.nameEn) {
+          <article class="menu-card">
+            <div class="menu-image"><img [src]="item.image" [alt]="itemName(item)" (error)="imageUnavailable($event)" /><span class="item-badge">{{ itemBadge(item) }}</span><button class="add-button" type="button" [attr.aria-label]="t('addToCart') + ' ' + itemName(item)" (click)="addToCart(item)">+</button></div>
+            <div class="menu-card-copy"><span class="item-category">{{ categoryLabel(item.category) }}</span><h3>{{ itemName(item) }}</h3><p>{{ itemDescription(item) }}</p><strong>{{ formatPrice(item.price) }} <small>{{ t('currency') }}</small></strong></div>
+          </article>
+        }
+      </div>
+    </section>
+  </div>
+} @else if (page === 'categories') {
+  <div class="portal-container categories-page">
+    <section class="category-intro">
+      <div><span class="eyebrow">{{ t('categoryEyebrow') }}</span><h1>{{ t('craving') }}</h1><p>{{ t('categoryDescription') }}</p></div>
+      <label class="menu-search"><span aria-hidden="true">⌕</span><input [(ngModel)]="searchTerm" [attr.aria-label]="t('search')" [placeholder]="t('search')" /></label>
+    </section>
+    <div class="category-filters" role="group" [attr.aria-label]="t('categoryFilters')">
+      @for (category of categories; track category) {
+        <button type="button" [class.selected]="selectedCategory === category" (click)="selectCategory(category)">{{ categoryLabel(category) }}</button>
+      }
+    </div>
+    <section class="category-feature">
+      <div><span class="eyebrow">{{ t('weeklyOffer') }}</span><h2>{{ t('sweeter') }}</h2><p>{{ t('offerDescription') }}</p></div>
+      <span class="feature-mark">-15%</span>
+    </section>
+    <div class="section-heading category-results-heading"><div><span class="eyebrow">{{ t('readyFresh') }}</span><h2>{{ selectedCategory === 'all' ? t('allDelights') : categoryLabel(selectedCategory) }}</h2></div><span class="result-count">{{ formatPrice(filteredItems.length) }} {{ t('choices') }}</span></div>
+    @if (filteredItems.length) {
+      <div class="menu-grid category-menu-grid">
+        @for (item of filteredItems; track item.nameEn) {
+          <article class="menu-card">
+            <div class="menu-image"><img [src]="item.image" [alt]="itemName(item)" (error)="imageUnavailable($event)" /><span class="item-badge">{{ itemBadge(item) }}</span><button class="add-button" type="button" [attr.aria-label]="t('addToCart') + ' ' + itemName(item)" (click)="addToCart(item)">+</button></div>
+            <div class="menu-card-copy"><span class="item-category">{{ categoryLabel(item.category) }}</span><h3>{{ itemName(item) }}</h3><p>{{ itemDescription(item) }}</p><div class="card-bottom"><strong>{{ formatPrice(item.price) }} <small>{{ t('currency') }}</small></strong><button class="quick-add" type="button" (click)="addToCart(item)">{{ t('addToCart') }} <span aria-hidden="true">+</span></button></div></div>
+          </article>
+        }
+      </div>
+    } @else {
+      <p class="empty-state">{{ t('emptySearch') }}</p>
+    }
+    <div class="cart-status" aria-live="polite"><span>{{ t('cart') }}</span><strong>{{ formatPrice(cart.itemCount) }}</strong><span>{{ t('item') }}</span></div>
+  </div>
+} @else if (page === 'cart') {
+  <div class="portal-container cart-page">
+    <section class="cart-heading"><div><span class="eyebrow">{{ t('cart') }}</span><h1>{{ t('cartTitle') }}</h1><p>{{ t('cartDescription') }}</p></div><a class="text-link" routerLink="/categories">{{ t('viewMenu') }} <span aria-hidden="true">←</span></a></section>
+    @if (cart.lines().length) {
+      <div class="cart-layout">
+        <section class="cart-lines" aria-label="اقلام سبد خرید">
+          @for (line of cart.lines(); track line.id) {
+            <article class="cart-line">
+              <div class="cart-product-image"><img [src]="line.image" [alt]="cartName(line.nameFa, line.nameEn)" /></div>
+              <div class="cart-product-info"><span class="item-category">{{ t('categoryCoffee') }}</span><h2>{{ cartName(line.nameFa, line.nameEn) }}</h2><strong>{{ formatPrice(line.price) }} <small>{{ t('currency') }}</small></strong></div>
+              <div class="quantity-control"><button type="button" [attr.aria-label]="t('remove')" (click)="updateCartQuantity(line.id, line.quantity - 1)">−</button><span>{{ formatPrice(line.quantity) }}</span><button type="button" [attr.aria-label]="t('quantity')" (click)="updateCartQuantity(line.id, line.quantity + 1)">+</button></div>
+              <strong class="line-total">{{ formatPrice(line.price * line.quantity) }} <small>{{ t('currency') }}</small></strong>
+              <button class="remove-line" type="button" [attr.aria-label]="t('remove')" (click)="removeFromCart(line.id)">×</button>
+            </article>
+          }
+        </section>
+        <aside class="cart-summary">
+          <h2>{{ t('total') }}</h2>
+          <div><span>{{ t('subtotal') }}</span><strong>{{ formatPrice(cart.total) }} <small>{{ t('currency') }}</small></strong></div>
+          <div><span>{{ t('deliveryFee') }}</span><strong>{{ t('free') }}</strong></div>
+          <div class="summary-total"><span>{{ t('total') }}</span><strong>{{ formatPrice(cart.total) }} <small>{{ t('currency') }}</small></strong></div>
+          <a class="button button-primary checkout-link" routerLink="/checkout">{{ t('continueCheckout') }} <span aria-hidden="true">←</span></a>
+        </aside>
+      </div>
+    } @else {
+      <div class="cart-empty"><span>♧</span><h2>{{ t('emptyCart') }}</h2><a class="button button-primary" routerLink="/categories">{{ t('browseMenu') }}</a></div>
+    }
+  </div>
+} @else {
+  <div class="portal-container checkout-page">
+    @if (cart.lastOrder(); as order) {
+      <section class="order-success">
+        <span class="success-check">✓</span><span class="eyebrow">{{ t('orderReceived') }}</span><h1>{{ t('orderReceived') }}</h1><p>{{ t('orderReceivedDescription') }}</p>
+        <div class="confirmation-number"><span>{{ t('orderNumber') }}</span><strong>{{ order.id }}</strong></div>
+        <a class="button button-primary" routerLink="/dashboard">{{ t('backToHome') }}</a>
+      </section>
+    } @else {
+      <section class="checkout-heading"><span class="eyebrow">{{ t('cart') }}</span><h1>{{ t('checkoutTitle') }}</h1><p>{{ t('checkoutDescription') }}</p></section>
+      @if (cart.lines().length) {
+        <div class="checkout-layout">
+          <form class="checkout-form" (ngSubmit)="submitOrder()">
+            <label>{{ t('customerName') }}<input [(ngModel)]="customerName" name="customerName" autocomplete="name" required /></label>
+            <label>{{ t('customerPhone') }}<input [(ngModel)]="customerPhone" name="customerPhone" type="tel" autocomplete="tel" required /></label>
+            <label>{{ t('address') }}<textarea [(ngModel)]="customerAddress" name="customerAddress" [placeholder]="t('addressPlaceholder')" rows="4" required></textarea></label>
+            <button class="button button-primary" type="submit">{{ t('submitOrder') }} <span aria-hidden="true">←</span></button>
+          </form>
+          <aside class="cart-summary checkout-summary"><h2>{{ t('cart') }} · {{ formatPrice(cart.itemCount) }} {{ t('item') }}</h2>@for (line of cart.lines(); track line.id) { <div><span>{{ cartName(line.nameFa, line.nameEn) }} × {{ formatPrice(line.quantity) }}</span><strong>{{ formatPrice(line.price * line.quantity) }}</strong></div> }<div class="summary-total"><span>{{ t('total') }}</span><strong>{{ formatPrice(cart.total) }} <small>{{ t('currency') }}</small></strong></div></aside>
+        </div>
+      } @else {
+        <div class="cart-empty"><span>♧</span><h2>{{ t('emptyCart') }}</h2><a class="button button-primary" routerLink="/categories">{{ t('browseMenu') }}</a></div>
+      }
+    }
+  </div>
+}
+
+@if (notice) {
+  <div class="toast" role="status">{{ notice }}</div>
+}
